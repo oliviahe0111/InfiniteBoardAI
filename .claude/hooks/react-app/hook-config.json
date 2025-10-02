@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "name": "React App Quality Check Hook",
+  "description": "Quality checks optimized for Next.js 15 App Router applications",
+  "projectType": "react-app",
+  "typescript": {
+    "enabled": true,
+    "showDependencyErrors": false,
+    "jsx": "react"
+  },
+  "eslint": {
+    "enabled": true,
+    "autofix": true,
+    "extends": ["next/core-web-vitals"]
+  },
+  "prettier": {
+    "enabled": true,
+    "autofix": true
+  },
+  "general": {
+    "autofixSilent": true,
+    "debug": false
+  },
+  "rules": {
+    "console": {
+      "enabled": true,
+      "severity": "info",
+      "message": "Consider using a logging library for production",
+      "allowIn": {
+        "paths": ["app/", "components/", "lib/"],
+        "fileTypes": ["component", "hook", "page", "test", "spec"],
+        "patterns": ["*.jsx", "*.tsx", "*.test.*", "*.spec.*"]
+      }
+    },
+    "asAny": {
+      "enabled": true,
+      "severity": "warning",
+      "message": "Prefer proper types or 'as unknown' for type assertions"
+    },
+    "debugger": {
+      "enabled": true,
+      "severity": "error",
+      "message": "Remove debugger statements before committing"
+    },
+    "todos": {
+      "enabled": true,
+      "severity": "info",
+      "patterns": ["TODO", "FIXME", "HACK"]
+    }
+  },
+  "fileTypes": {
+    "component": {
+      "patterns": ["*.jsx", "*.tsx"],
+      "paths": ["components/", "app/components/"]
+    },
+    "hook": {
+      "patterns": ["use*.js", "use*.ts", "use*.jsx", "use*.tsx"],
+      "paths": ["hooks/", "lib/hooks/"]
+    },
+    "page": {
+      "patterns": ["page.tsx", "layout.tsx", "route.ts"],
+      "paths": ["app/"]
+    }
+  },
+  "ignore": {
+    "paths": [
+      "node_modules/",
+      "build/",
+      "dist/",
+      ".next/",
+      "coverage/",
+      "public/",
+      "prisma/migrations/",
+      "*.config.js",
+      "*.config.ts"
+    ]
+  }
+}

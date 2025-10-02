@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  title     String
+  ownerId   String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  nodes Node[]
+
+  @@index([ownerId, updatedAt(sort: Desc)])
+}
+
+enum NodeType {
+  QUESTION
+  ANSWER
+}
+
+model Node {
+  id        String   @id @default(cuid())
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  parentId  String?
+  parent    Node?    @relation("NodeToNode", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Node[]   @relation("NodeToNode")
+
+  rootId    String?
+
+  type      NodeType
+  content   String   @db.Text
+
+  x         Int
+  y         Int
+  width     Int
+  height    Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([boardId])
+  @@index([parentId])
+  @@index([rootId])
+}
