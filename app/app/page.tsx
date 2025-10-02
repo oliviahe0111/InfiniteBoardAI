@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "./SignOutButton";
 import { MyBoardsClient } from "./MyBoardsClient";
+import { UserAvatar } from "./UserAvatar";
 
 const prisma = new PrismaClient();
 
@@ -29,7 +30,8 @@ export default async function MyBoardsPage() {
   return (
     <div className="min-h-screen bg-background-dark text-gray-200">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-end mb-4">
+        <div className="flex items-center gap-3 justify-end mb-4">
+          <UserAvatar user={user} />
           <SignOutButton />
         </div>
         <MyBoardsClient initialBoards={boards} />
