@@ -29,7 +29,8 @@
     "next": "^15.1.6",
     "prisma": "^6.16.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-zoom-pan-pinch": "^3.7.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

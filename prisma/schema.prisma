@@ -14,11 +14,12 @@ datasource db {
 }
 
 model Board {
-  id        String   @id @default(cuid())
-  title     String
-  ownerId   String   @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  ownerId     String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   nodes Node[]
 
@@ -26,8 +27,10 @@ model Board {
 }
 
 enum NodeType {
-  QUESTION
-  ANSWER
+  root_question
+  ai_answer
+  followup_question
+  followup_answer
 }
 
 model Node {
@@ -36,19 +39,19 @@ model Node {
   board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
   parentId  String?
-  parent    Node?    @relation("NodeToNode", fields: [parentId], references: [id], onDelete: Cascade)
-  children  Node[]   @relation("NodeToNode")
+  parent    Node?    @relation("NodeToChildren", fields: [parentId], references: [id], onDelete: SetNull)
+  children  Node[]   @relation("NodeToChildren")
 
   rootId    String?
+  root      Node?    @relation("NodeToRoot", fields: [rootId], references: [id], onDelete: SetNull)
+  rootDesc  Node[]   @relation("NodeToRoot")
 
   type      NodeType
   content   String   @db.Text
-
   x         Int
   y         Int
   width     Int
   height    Int
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

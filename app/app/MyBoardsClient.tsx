@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { BoardCard } from "@/components/boards/BoardCard";
 import { CreateBoardModal } from "@/components/boards/CreateBoardModal";
@@ -18,6 +19,7 @@ interface MyBoardsClientProps {
 }
 
 export function MyBoardsClient({ initialBoards }: MyBoardsClientProps) {
+  const router = useRouter();
   const [boards, setBoards] = useState<Board[]>(initialBoards);
   const [createOpen, setCreateOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -37,6 +39,8 @@ export function MyBoardsClient({ initialBoards }: MyBoardsClientProps) {
     if (res.ok) {
       const newBoard = await res.json();
       setBoards([newBoard, ...boards]);
+      // Navigate to the newly created board
+      router.push(`/app/boards/${newBoard.id}`);
     }
   };
 

@@ -62,11 +62,11 @@ export async function POST(request: Request) {
   await prisma.node.create({
     data: {
       boardId: board.id,
-      type: "QUESTION",
+      type: "root_question",
       content: firstQuestion,
-      x: 0,
-      y: 0,
-      width: 300,
+      x: 400,
+      y: 200,
+      width: 320,
       height: 150,
       rootId: null,
     },

@@ -27,7 +27,7 @@ export function BoardCard({
 
   return (
     <div className="group relative bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 p-6 transition-colors">
-      <Link href={`/app/${id}`} className="block">
+      <Link href={`/app/boards/${id}`} className="block">
         <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
         <p className="text-sm text-gray-400">Updated {formattedDate}</p>
       </Link>
