@@ -25,14 +25,14 @@ export function DeleteConfirmModal({
       return {
         title: "Delete Root Question?",
         description:
-          "This will permanently delete this question and its AI response. Any follow-up questions will become independent root questions.",
+          "Do you really wanna delete this question?",
         warning: "This action cannot be undone.",
       };
     } else if (nodeType === "followup_question") {
       return {
         title: "Delete Follow-up Question?",
         description:
-          "This will permanently delete this follow-up question and its AI response. Any nested follow-ups will become root questions.",
+          "Do you really wanna delete this question?",
         warning: "This action cannot be undone.",
       };
     }
