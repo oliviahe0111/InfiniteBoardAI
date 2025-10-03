@@ -80,8 +80,8 @@ export default function Home() {
                 }}
               >
                 <iframe
-                  src="https://demo.arcade.software/AI8z3mWp13AwbT7Me9s9?embed&embed_mobile=inline&embed_desktop=inline&show_copy_link=true"
-                  title="Ask and Explore Language Questions on the Demo Board"
+                  src="https://demo.arcade.software/xOY5G7NZOH4K251Ju9I4?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
+                  title="Ask Follow-Up Questions and Explore AI Responses on the Demo Board"
                   frameBorder="0"
                   loading="lazy"
                   allowFullScreen
