@@ -128,11 +128,27 @@ export async function DELETE(
   // Promote children to root nodes
   if (children.length > 0) {
     for (const child of children) {
+      // Update the child question to be a root node
+      // Change its type from followup_question to root_question
       await prisma.node.update({
         where: { id: child.id },
         data: {
-          rootId: child.id, // Promote to root
+          type: "root_question", // Promote followup to root
+          rootId: child.id, // Root references itself
           parentId: null, // Remove parent reference
+        },
+      });
+
+      // Update the child's answer to reference the promoted question as its root
+      await prisma.node.updateMany({
+        where: {
+          boardId,
+          parentId: child.id,
+          type: "followup_answer",
+        },
+        data: {
+          type: "ai_answer", // Promote followup_answer to ai_answer
+          rootId: child.id, // Answer references the promoted question as root
         },
       });
     }

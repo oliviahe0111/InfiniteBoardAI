@@ -1,11 +1,17 @@
 "use client";
 
-import { User } from "@supabase/supabase-js";
 import Image from "next/image";
 import { useState } from "react";
 
 interface UserAvatarProps {
-  user: User;
+  user: {
+    id: string;
+    email?: string;
+    user_metadata?: {
+      avatar_url?: string;
+      full_name?: string;
+    };
+  };
 }
 
 // Helper function to validate avatar URLs

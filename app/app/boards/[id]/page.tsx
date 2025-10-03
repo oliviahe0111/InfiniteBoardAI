@@ -58,12 +58,20 @@ export default async function BoardPage({ params }: BoardPageProps) {
       width: node.width,
       height: node.height,
       rootId: node.rootId,
+      parentId: node.parentId,
     })),
+  };
+
+  // Serialize user data
+  const serializedUser = {
+    id: user.id,
+    email: user.email,
+    user_metadata: user.user_metadata,
   };
 
   return (
     <div className="h-screen w-screen bg-background-dark">
-      <BoardCanvas board={serializedBoard} />
+      <BoardCanvas board={serializedBoard} user={serializedUser} />
     </div>
   );
 }

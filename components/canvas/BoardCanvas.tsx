@@ -4,6 +4,7 @@ import { useState, useMemo, useRef } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { CanvasNode } from "./CanvasNode";
 import { AskQuestionModal } from "./AskQuestionModal";
+import { UserAvatar } from "@/app/app/UserAvatar";
 import { Plus, Maximize2, FocusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -16,6 +17,7 @@ interface Node {
   width: number;
   height: number;
   rootId: string | null;
+  parentId: string | null;
 }
 
 interface Board {
@@ -26,9 +28,17 @@ interface Board {
 
 interface BoardCanvasProps {
   board: Board;
+  user: {
+    id: string;
+    email?: string;
+    user_metadata?: {
+      avatar_url?: string;
+      full_name?: string;
+    };
+  };
 }
 
-export function BoardCanvas({ board: initialBoard }: BoardCanvasProps) {
+export function BoardCanvas({ board: initialBoard, user }: BoardCanvasProps) {
   const router = useRouter();
   const [scale, setScale] = useState(1);
   const [board, setBoard] = useState(initialBoard);
@@ -210,7 +220,7 @@ export function BoardCanvas({ board: initialBoard }: BoardCanvasProps) {
           </h1>
         </div>
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+          <UserAvatar user={user} />
         </div>
       </header>
 

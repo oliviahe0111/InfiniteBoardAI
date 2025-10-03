@@ -17,6 +17,7 @@ interface Node {
   width: number;
   height: number;
   rootId: string | null;
+  parentId: string | null;
 }
 
 interface CanvasNodeProps {
@@ -138,12 +139,24 @@ export function CanvasNode({
   // Find matching AI answer for this question
   const aiAnswer = useMemo(() => {
     if (type === "root_question" || type === "followup_question") {
+      // For root questions, look for ai_answer with matching rootId
+      // For follow-up questions, look for followup_answer with matching rootId
       const answerType =
         type === "root_question" ? "ai_answer" : "followup_answer";
-      const answer = allNodes.find(
-        (n) =>
-          n.id !== id && n.rootId === (rootId || id) && n.type === answerType
+
+      // First try to find by parentId (most reliable)
+      let answer = allNodes.find(
+        (n) => n.id !== id && n.parentId === id && n.type === answerType
       );
+
+      // Fallback: find by rootId matching
+      if (!answer) {
+        answer = allNodes.find(
+          (n) =>
+            n.id !== id && n.rootId === (rootId || id) && n.type === answerType
+        );
+      }
+
       return answer?.content || null;
     }
     return null;
