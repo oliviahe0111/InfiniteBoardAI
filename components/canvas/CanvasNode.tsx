@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { MessageCircle, Sparkles, X } from "lucide-react";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { AskFollowUpModal } from "./AskFollowUpModal";
 import ReactMarkdown from "react-markdown";
 
 interface Node {
@@ -32,6 +34,12 @@ interface CanvasNodeProps {
   onSizeChange?: (id: string, width: number, height: number) => void;
   onDelete?: (id: string) => void;
   onClick?: () => void;
+  onAskFollowUp?: (
+    question: string,
+    quotedText: string,
+    parentNodeId: string,
+    rootNodeId: string
+  ) => Promise<void>;
 }
 
 // Color palette for different root questions
@@ -98,6 +106,7 @@ export function CanvasNode({
   onSizeChange,
   onDelete,
   onClick,
+  onAskFollowUp,
 }: CanvasNodeProps) {
   const colors = getThreadColor(rootId, id);
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -106,6 +115,10 @@ export function CanvasNode({
   const [isSelected, setIsSelected] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+  const [showAskButton, setShowAskButton] = useState(false);
+  const [askButtonPosition, setAskButtonPosition] = useState({ x: 0, y: 0 });
+  const [showFollowUpModal, setShowFollowUpModal] = useState(false);
   const [position, setPosition] = useState({ x: initialX, y: initialY });
   const [size, setSize] = useState({
     width: initialWidth,
@@ -315,6 +328,56 @@ export function CanvasNode({
     onDelete?.(id);
   };
 
+  // Handle text selection for follow-up questions
+  const handleTextSelection = () => {
+    const selection = window.getSelection();
+    const text = selection?.toString().trim();
+
+    if (text && text.length > 0) {
+      setSelectedText(text);
+
+      // Get selection position
+      const range = selection?.getRangeAt(0);
+      const rect = range?.getBoundingClientRect();
+
+      if (rect) {
+        setAskButtonPosition({
+          x: rect.left + rect.width / 2,
+          y: rect.bottom + 5,
+        });
+        setShowAskButton(true);
+      }
+    } else {
+      setShowAskButton(false);
+    }
+  };
+
+  const handleAskFollowUpClick = () => {
+    setShowAskButton(false);
+    setShowFollowUpModal(true);
+  };
+
+  const handleFollowUpSubmit = async (question: string) => {
+    if (onAskFollowUp && aiAnswer) {
+      // Find the answer node ID
+      const answerType =
+        type === "root_question" ? "ai_answer" : "followup_answer";
+      const answerNode = allNodes.find(
+        (n) =>
+          n.id !== id && n.rootId === (rootId || id) && n.type === answerType
+      );
+
+      if (answerNode) {
+        await onAskFollowUp(
+          question,
+          selectedText,
+          answerNode.id, // parentId is the answer node
+          rootId || id // rootId
+        );
+      }
+    }
+  };
+
   const Icon = MessageCircle;
 
   return (
@@ -411,10 +474,44 @@ export function CanvasNode({
                 </span>
               </button>
               {isExpanded && (
-                <div className="text-sm leading-relaxed text-gray-800 bg-green-50 p-3 rounded-lg border border-green-200 prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-800 prose-strong:text-gray-900 prose-ul:text-gray-800 prose-ol:text-gray-800 prose-li:text-gray-800">
+                <div
+                  className="text-sm leading-relaxed text-gray-800 bg-green-50 p-3 rounded-lg border border-green-200 prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-800 prose-strong:text-gray-900 prose-ul:text-gray-800 prose-ol:text-gray-800 prose-li:text-gray-800 relative select-text cursor-text"
+                  onMouseUp={handleTextSelection}
+                  onMouseDown={(e) => e.stopPropagation()}
+                >
                   <ReactMarkdown>{aiAnswer}</ReactMarkdown>
                 </div>
               )}
+
+              {/* Ask AI About This Button - Portal */}
+              {showAskButton &&
+                onAskFollowUp &&
+                typeof window !== "undefined" &&
+                createPortal(
+                  <button
+                    style={{
+                      position: "fixed",
+                      left: `${askButtonPosition.x}px`,
+                      top: `${askButtonPosition.y}px`,
+                      transform: "translateX(-50%)",
+                    }}
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-primary hover:bg-primary/90 rounded-lg shadow-lg z-50 whitespace-nowrap flex items-center gap-1 pointer-events-auto"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleAskFollowUpClick();
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    data-selection-ui="true"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    Ask AI about this
+                  </button>,
+                  document.body
+                )}
             </div>
           )}
         </div>
@@ -452,6 +549,14 @@ export function CanvasNode({
         onOpenChange={setShowDeleteModal}
         onConfirm={handleConfirmDelete}
         nodeType={type}
+      />
+
+      {/* Ask Follow-Up Modal */}
+      <AskFollowUpModal
+        open={showFollowUpModal}
+        onOpenChange={setShowFollowUpModal}
+        quotedText={selectedText}
+        onSubmit={handleFollowUpSubmit}
       />
     </motion.div>
   );

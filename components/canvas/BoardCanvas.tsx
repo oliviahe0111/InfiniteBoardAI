@@ -73,6 +73,47 @@ export function BoardCanvas({ board: initialBoard }: BoardCanvasProps) {
     }
   };
 
+  const handleAskFollowUp = async (
+    question: string,
+    quotedText: string,
+    parentNodeId: string,
+    rootNodeId: string
+  ) => {
+    // Find the root question to position follow-up nearby
+    const rootNode = board.nodes.find((n) => n.id === rootNodeId);
+
+    if (!rootNode) {
+      console.error("Root node not found");
+      return;
+    }
+
+    // Position near root question with some offset
+    const offsetX = 100 + Math.floor(Math.random() * 50); // 100-150px offset
+    const offsetY = 150 + Math.floor(Math.random() * 50); // 150-200px offset
+
+    const res = await fetch(`/api/ai/ask`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        boardId: board.id,
+        rootId: rootNodeId,
+        parentId: parentNodeId,
+        question,
+        quotedText,
+        position: { x: rootNode.x + offsetX, y: rootNode.y + offsetY },
+      }),
+    });
+
+    if (res.ok) {
+      const { question: questionNode, answer: answerNode } = await res.json();
+      setBoard({
+        ...board,
+        nodes: [...board.nodes, questionNode, answerNode],
+      });
+      router.refresh();
+    }
+  };
+
   const handleNodePositionChange = (nodeId: string, x: number, y: number) => {
     // Optimistic update
     setBoard({
@@ -373,6 +414,7 @@ export function BoardCanvas({ board: initialBoard }: BoardCanvasProps) {
                         onPositionChange={handleNodePositionChange}
                         onSizeChange={handleNodeSizeChange}
                         onDelete={handleDeleteNode}
+                        onAskFollowUp={handleAskFollowUp}
                       />
                     ))}
                   </div>

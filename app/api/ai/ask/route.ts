@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
     const answerY = questionY;
 
     // Create question node
-    const questionNode = await prisma.node.create({
+    let questionNode = await prisma.node.create({
       data: {
         boardId: body.boardId,
         type: body.parentId ? "followup_question" : "root_question",
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
 
     // For root questions, set rootId to self
     if (!body.rootId) {
-      await prisma.node.update({
+      questionNode = await prisma.node.update({
         where: { id: questionNode.id },
         data: { rootId: questionNode.id },
       });
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
         type: body.parentId ? "followup_answer" : "ai_answer",
         content: llmContent,
         parentId: questionNode.id,
-        rootId: body.rootId || questionNode.id,
+        rootId: questionNode.rootId || questionNode.id,
         x: answerX,
         y: answerY,
         width: 320,
