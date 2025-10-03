@@ -58,19 +58,6 @@ export async function POST(request: Request) {
     },
   });
 
-  // Create the initial question node
-  await prisma.node.create({
-    data: {
-      boardId: board.id,
-      type: "root_question",
-      content: firstQuestion,
-      x: 400,
-      y: 200,
-      width: 320,
-      height: 150,
-      rootId: null,
-    },
-  });
-
-  return NextResponse.json(board);
+  // Return board with the firstQuestion so the client can create the Q&A
+  return NextResponse.json({ ...board, firstQuestion });
 }

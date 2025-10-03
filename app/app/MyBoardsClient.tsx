@@ -39,8 +39,10 @@ export function MyBoardsClient({ initialBoards }: MyBoardsClientProps) {
     if (res.ok) {
       const newBoard = await res.json();
       setBoards([newBoard, ...boards]);
-      // Navigate to the newly created board
-      router.push(`/app/boards/${newBoard.id}`);
+      // Navigate to the newly created board with the first question as a query param
+      router.push(
+        `/app/boards/${newBoard.id}?q=${encodeURIComponent(data.firstQuestion)}`
+      );
     }
   };
 

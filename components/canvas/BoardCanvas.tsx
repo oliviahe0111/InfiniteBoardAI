@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { CanvasNode } from "./CanvasNode";
 import { AskQuestionModal } from "./AskQuestionModal";
 import { UserAvatar } from "@/app/app/UserAvatar";
 import { Plus, Maximize2, FocusIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Node {
   id: string;
@@ -40,9 +40,11 @@ interface BoardCanvasProps {
 
 export function BoardCanvas({ board: initialBoard, user }: BoardCanvasProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [scale, setScale] = useState(1);
   const [board, setBoard] = useState(initialBoard);
   const [askModalOpen, setAskModalOpen] = useState(false);
+  const hasCreatedInitialQuestion = useRef(false);
 
   // Debounce refs for autosave
   const saveTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
@@ -55,6 +57,21 @@ export function BoardCanvas({ board: initialBoard, user }: BoardCanvasProps) {
     `[BoardCanvas] Rendering with ${memoizedNodes.length} nodes:`,
     memoizedNodes
   );
+
+  // Handle initial question from query parameter
+  useEffect(() => {
+    const firstQuestion = searchParams.get("q");
+    if (
+      firstQuestion &&
+      board.nodes.length === 0 &&
+      !hasCreatedInitialQuestion.current
+    ) {
+      hasCreatedInitialQuestion.current = true;
+      handleAskQuestion(firstQuestion);
+      // Remove query parameter from URL
+      router.replace(`/app/boards/${board.id}`);
+    }
+  }, [searchParams, board.nodes.length, board.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAskQuestion = async (question: string) => {
     // Random position to avoid stacking
