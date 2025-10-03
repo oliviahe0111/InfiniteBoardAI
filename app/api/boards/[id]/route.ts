@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import { PrismaClient } from "@prisma/client";
+
 import { NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 // PATCH /api/boards/[id] - Update board title
 export async function PATCH(

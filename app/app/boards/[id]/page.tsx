@@ -1,9 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { BoardCanvas } from "@/components/canvas/BoardCanvas";
-
-const prisma = new PrismaClient();
 
 interface BoardPageProps {
   params: Promise<{
@@ -27,7 +25,9 @@ export default async function BoardPage({ params }: BoardPageProps) {
   const board = await prisma.board.findUnique({
     where: { id },
     include: {
-      nodes: true,
+      nodes: {
+        orderBy: { createdAt: "asc" }, // Oldest first for DOM z-index
+      },
     },
   });
 
@@ -35,9 +35,35 @@ export default async function BoardPage({ params }: BoardPageProps) {
     redirect("/app");
   }
 
+  // Debug: Log node count
+  console.log(
+    `[BoardPage] Loading board "${board.title}" with ${board.nodes.length} nodes`
+  );
+  board.nodes.forEach((node) => {
+    console.log(
+      `[Node] ${node.type}: "${node.content.substring(0, 50)}..." at (${node.x}, ${node.y})`
+    );
+  });
+
+  // Convert to plain JSON to avoid Next.js serialization issues
+  const serializedBoard = {
+    id: board.id,
+    title: board.title,
+    nodes: board.nodes.map((node) => ({
+      id: node.id,
+      type: node.type,
+      content: node.content,
+      x: node.x,
+      y: node.y,
+      width: node.width,
+      height: node.height,
+      rootId: node.rootId,
+    })),
+  };
+
   return (
     <div className="h-screen w-screen bg-background-dark">
-      <BoardCanvas board={board} />
+      <BoardCanvas board={serializedBoard} />
     </div>
   );
 }

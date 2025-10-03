@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useRef } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { CanvasNode } from "./CanvasNode";
 import { AskQuestionModal } from "./AskQuestionModal";
@@ -34,36 +34,46 @@ export function BoardCanvas({ board: initialBoard }: BoardCanvasProps) {
   const [board, setBoard] = useState(initialBoard);
   const [askModalOpen, setAskModalOpen] = useState(false);
 
+  // Debounce refs for autosave
+  const saveTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
+
+  // Memoize nodes to prevent unnecessary re-renders
+  const memoizedNodes = useMemo(() => board.nodes, [board.nodes]);
+
+  // Debug: Log initial board data
+  console.log(
+    `[BoardCanvas] Rendering with ${memoizedNodes.length} nodes:`,
+    memoizedNodes
+  );
+
   const handleAskQuestion = async (question: string) => {
     // Random position to avoid stacking
     const randomX = Math.floor(Math.random() * 600) + 200; // 200-800
     const randomY = Math.floor(Math.random() * 400) + 100; // 100-500
 
-    const res = await fetch(`/api/boards/${board.id}/nodes`, {
+    const res = await fetch(`/api/ai/ask`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        boardId: board.id,
+        rootId: null,
+        parentId: null,
         question,
-        x: randomX,
-        y: randomY,
+        position: { x: randomX, y: randomY },
       }),
     });
 
     if (res.ok) {
-      const newNode = await res.json();
+      const { question: questionNode, answer: answerNode } = await res.json();
       setBoard({
         ...board,
-        nodes: [...board.nodes, newNode],
+        nodes: [...board.nodes, questionNode, answerNode],
       });
       router.refresh();
     }
   };
 
-  const handleNodePositionChange = async (
-    nodeId: string,
-    x: number,
-    y: number
-  ) => {
+  const handleNodePositionChange = (nodeId: string, x: number, y: number) => {
     // Optimistic update
     setBoard({
       ...board,
@@ -72,15 +82,21 @@ export function BoardCanvas({ board: initialBoard }: BoardCanvasProps) {
       ),
     });
 
-    // Save to database
-    await fetch(`/api/boards/${board.id}/nodes/${nodeId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ x, y }),
-    });
+    // Debounced save to database
+    if (saveTimeoutRef.current[nodeId]) {
+      clearTimeout(saveTimeoutRef.current[nodeId]);
+    }
+
+    saveTimeoutRef.current[nodeId] = setTimeout(() => {
+      fetch(`/api/boards/${board.id}/nodes/${nodeId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ x, y }),
+      });
+    }, 500); // 500ms debounce
   };
 
-  const handleNodeSizeChange = async (
+  const handleNodeSizeChange = (
     nodeId: string,
     width: number,
     height: number
@@ -93,12 +109,39 @@ export function BoardCanvas({ board: initialBoard }: BoardCanvasProps) {
       ),
     });
 
-    // Save to database
-    await fetch(`/api/boards/${board.id}/nodes/${nodeId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ width, height }),
+    // Debounced save to database
+    if (saveTimeoutRef.current[nodeId]) {
+      clearTimeout(saveTimeoutRef.current[nodeId]);
+    }
+
+    saveTimeoutRef.current[nodeId] = setTimeout(() => {
+      fetch(`/api/boards/${board.id}/nodes/${nodeId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ width, height }),
+      });
+    }, 500); // 500ms debounce
+  };
+
+  const handleDeleteNode = async (nodeId: string) => {
+    // Delete from database first to get deletedIds
+    const res = await fetch(`/api/boards/${board.id}/nodes/${nodeId}`, {
+      method: "DELETE",
     });
+
+    if (res.ok) {
+      const { deletedIds } = await res.json();
+
+      // Remove both the question and answer nodes from state
+      setBoard({
+        ...board,
+        nodes: board.nodes.filter((node) => !deletedIds.includes(node.id)),
+      });
+    } else {
+      // Show error if deletion failed
+      console.error("Failed to delete node");
+      alert("Failed to delete the question. Please try again.");
+    }
   };
 
   return (
@@ -150,94 +193,193 @@ export function BoardCanvas({ board: initialBoard }: BoardCanvasProps) {
           centerOnInit
           limitToBounds={false}
           onZoom={(ref) => setScale(ref.state.scale)}
+          onTransformed={(ref) => setScale(ref.state.scale)}
+          panning={{ disabled: false, velocityDisabled: true }}
+          wheel={{ step: 0.1 }}
+          pinch={{ step: 5 }}
+          doubleClick={{ disabled: true }}
         >
-          {({ zoomIn, zoomOut, resetTransform, centerView }) => (
-            <>
-              {/* Zoom Controls */}
-              <div className="absolute bottom-4 right-4 flex items-center gap-1 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-1.5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 z-10">
-                <button
-                  onClick={() => zoomIn()}
-                  className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-                  title="Zoom In"
-                >
-                  <svg
-                    className="w-5 h-5 text-slate-600 dark:text-slate-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => zoomOut()}
-                  className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-                  title="Zoom Out"
-                >
-                  <svg
-                    className="w-5 h-5 text-slate-600 dark:text-slate-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => resetTransform()}
-                  className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-                  title="Fit to Content"
-                >
-                  <Maximize2 className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                </button>
-                <button
-                  onClick={() => centerView()}
-                  className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-                  title="Reset View"
-                >
-                  <FocusIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                </button>
-                <div className="border-l border-slate-300 dark:border-slate-700 h-6 mx-1"></div>
-                <span className="text-sm font-semibold text-slate-600 dark:text-slate-400 px-2 w-20 text-center">
-                  {Math.round(scale * 100)}%
-                </span>
-              </div>
+          {({ resetTransform, centerView, setTransform, instance }) => {
+            const handleZoomIn = () => {
+              const currentState = instance.transformState;
+              const currentScale = currentState.scale;
+              const newScale = Math.min(currentScale + 0.1, 4);
 
-              {/* Infinite Canvas */}
-              <TransformComponent
-                wrapperClass="w-full h-full"
-                contentClass="w-full h-full"
-              >
-                <div className="absolute inset-0" id="canvas">
-                  {board.nodes.map((node) => (
-                    <CanvasNode
-                      key={node.id}
-                      id={node.id}
-                      type={node.type}
-                      content={node.content}
-                      x={node.x}
-                      y={node.y}
-                      width={node.width}
-                      height={node.height}
-                      rootId={node.rootId}
-                      onPositionChange={handleNodePositionChange}
-                      onSizeChange={handleNodeSizeChange}
-                    />
-                  ))}
+              // Calculate viewport center
+              const viewportWidth = window.innerWidth;
+              const viewportHeight = window.innerHeight - 64; // Subtract header
+
+              // Calculate center point in canvas coordinates (before zoom)
+              const canvasCenterX =
+                (viewportWidth / 2 - currentState.positionX) / currentScale;
+              const canvasCenterY =
+                (viewportHeight / 2 - currentState.positionY) / currentScale;
+
+              // Calculate new position to keep center point fixed
+              const newX = viewportWidth / 2 - canvasCenterX * newScale;
+              const newY = viewportHeight / 2 - canvasCenterY * newScale;
+
+              setTransform(newX, newY, newScale, 200);
+            };
+
+            const handleZoomOut = () => {
+              const currentState = instance.transformState;
+              const currentScale = currentState.scale;
+              const newScale = Math.max(currentScale - 0.1, 0.1);
+
+              // Calculate viewport center
+              const viewportWidth = window.innerWidth;
+              const viewportHeight = window.innerHeight - 64; // Subtract header
+
+              // Calculate center point in canvas coordinates (before zoom)
+              const canvasCenterX =
+                (viewportWidth / 2 - currentState.positionX) / currentScale;
+              const canvasCenterY =
+                (viewportHeight / 2 - currentState.positionY) / currentScale;
+
+              // Calculate new position to keep center point fixed
+              const newX = viewportWidth / 2 - canvasCenterX * newScale;
+              const newY = viewportHeight / 2 - canvasCenterY * newScale;
+
+              setTransform(newX, newY, newScale, 200);
+            };
+
+            const fitToContent = () => {
+              if (memoizedNodes.length === 0) {
+                centerView();
+                return;
+              }
+
+              // Calculate bounding box of all nodes
+              let minX = Infinity,
+                minY = Infinity;
+              let maxX = -Infinity,
+                maxY = -Infinity;
+
+              memoizedNodes.forEach((node) => {
+                minX = Math.min(minX, node.x);
+                minY = Math.min(minY, node.y);
+                maxX = Math.max(maxX, node.x + node.width);
+                maxY = Math.max(maxY, node.y + node.height);
+              });
+
+              const contentWidth = maxX - minX;
+              const contentHeight = maxY - minY;
+              const centerX = minX + contentWidth / 2;
+              const centerY = minY + contentHeight / 2;
+
+              // Calculate zoom to fit with padding
+              const viewportWidth = window.innerWidth;
+              const viewportHeight = window.innerHeight - 64; // Subtract header
+              const padding = 100;
+
+              const scaleX = (viewportWidth - padding * 2) / contentWidth;
+              const scaleY = (viewportHeight - padding * 2) / contentHeight;
+              const newScale = Math.min(Math.max(scaleX, scaleY, 0.1), 4);
+
+              // Center on content
+              setTransform(
+                viewportWidth / 2 - centerX * newScale,
+                viewportHeight / 2 - centerY * newScale,
+                newScale
+              );
+            };
+
+            return (
+              <>
+                {/* Zoom Controls */}
+                <div className="absolute bottom-4 right-4 flex items-center gap-1 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-1.5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 z-10">
+                  <button
+                    onClick={handleZoomIn}
+                    className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    title="Zoom In"
+                  >
+                    <svg
+                      className="w-5 h-5 text-slate-600 dark:text-slate-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleZoomOut}
+                    className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    title="Zoom Out"
+                  >
+                    <svg
+                      className="w-5 h-5 text-slate-600 dark:text-slate-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={fitToContent}
+                    className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    title="Fit to Content"
+                  >
+                    <Maximize2 className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <button
+                    onClick={() => resetTransform()}
+                    className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    title="Reset View"
+                  >
+                    <FocusIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                  </button>
+                  <div className="border-l border-slate-300 dark:border-slate-700 h-6 mx-1"></div>
+                  <span className="text-sm font-semibold text-slate-600 dark:text-slate-400 px-2 w-20 text-center">
+                    {Math.round(scale * 100)}%
+                  </span>
                 </div>
-              </TransformComponent>
-            </>
-          )}
+
+                {/* Infinite Canvas */}
+                <TransformComponent
+                  wrapperClass="w-full h-full"
+                  contentClass="w-full h-full"
+                >
+                  <div
+                    className="relative"
+                    style={{ width: "5000px", height: "5000px" }}
+                    id="canvas"
+                  >
+                    {memoizedNodes.map((node) => (
+                      <CanvasNode
+                        key={node.id}
+                        id={node.id}
+                        type={node.type}
+                        content={node.content}
+                        x={node.x}
+                        y={node.y}
+                        width={node.width}
+                        height={node.height}
+                        rootId={node.rootId}
+                        boardId={board.id}
+                        allNodes={memoizedNodes}
+                        onPositionChange={handleNodePositionChange}
+                        onSizeChange={handleNodeSizeChange}
+                        onDelete={handleDeleteNode}
+                      />
+                    ))}
+                  </div>
+                </TransformComponent>
+              </>
+            );
+          }}
         </TransformWrapper>
       </main>
 

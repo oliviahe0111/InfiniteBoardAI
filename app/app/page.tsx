@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import { PrismaClient } from "@prisma/client";
+
 import { redirect } from "next/navigation";
 import { SignOutButton } from "./SignOutButton";
 import { MyBoardsClient } from "./MyBoardsClient";
 import { UserAvatar } from "./UserAvatar";
 
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export default async function MyBoardsPage() {
   const supabase = await createClient();

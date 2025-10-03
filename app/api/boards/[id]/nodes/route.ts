@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import { PrismaClient } from "@prisma/client";
+
 import { NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 // POST /api/boards/[id]/nodes - Create a new question node
 export async function POST(
