@@ -102,13 +102,12 @@ export async function DELETE(
     nodeToDelete.type === "root_question" ||
     nodeToDelete.type === "followup_question"
   ) {
-    // This is a question - find its paired answer
+    // This is a question - find its paired answer by parentId (most reliable)
     const answerType =
       nodeToDelete.type === "root_question" ? "ai_answer" : "followup_answer";
     const pairedAnswer = await prisma.node.findFirst({
       where: {
         boardId,
-        rootId: nodeToDelete.rootId || nodeToDelete.id,
         parentId: nodeToDelete.id,
         type: answerType,
       },
@@ -122,33 +121,60 @@ export async function DELETE(
     pairedNodeId = nodeToDelete.parentId;
   }
 
-  // Get all children of the node being deleted
-  const children = nodeToDelete.children;
+  // Get all children of both the question and answer being deleted
+  const questionChildren = nodeToDelete.children;
+  const answerChildren = pairedNodeId
+    ? await prisma.node.findMany({
+        where: { parentId: pairedNodeId },
+      })
+    : [];
 
-  // Promote children to root nodes
-  if (children.length > 0) {
-    for (const child of children) {
-      // Update the child question to be a root node
-      // Change its type from followup_question to root_question
+  // Combine all children that need to be promoted
+  const allChildren = [...questionChildren, ...answerChildren];
+
+  // Promote children to root nodes and update thread rootIds
+  if (allChildren.length > 0) {
+    // Find the first follow-up question to promote as the new root
+    const firstFollowUp = allChildren.find(
+      (child) => child.type === "followup_question"
+    );
+
+    if (firstFollowUp) {
+      // Get the old rootId before deletion (to update all nodes in the thread)
+      const oldRootId = nodeToDelete.rootId || nodeToDelete.id;
+
+      // Promote the first follow-up to root
       await prisma.node.update({
-        where: { id: child.id },
+        where: { id: firstFollowUp.id },
         data: {
-          type: "root_question", // Promote followup to root
-          rootId: child.id, // Root references itself
-          parentId: null, // Remove parent reference
+          type: "root_question",
+          rootId: firstFollowUp.id, // New root references itself
+          parentId: null,
         },
       });
 
-      // Update the child's answer to reference the promoted question as its root
+      // Promote its answer
       await prisma.node.updateMany({
         where: {
           boardId,
-          parentId: child.id,
+          parentId: firstFollowUp.id,
           type: "followup_answer",
         },
         data: {
-          type: "ai_answer", // Promote followup_answer to ai_answer
-          rootId: child.id, // Answer references the promoted question as root
+          type: "ai_answer",
+          rootId: firstFollowUp.id,
+        },
+      });
+
+      // Update ALL nodes in the thread that had the old rootId to point to the new root
+      await prisma.node.updateMany({
+        where: {
+          boardId,
+          rootId: oldRootId,
+          id: { not: nodeToDelete.id }, // Exclude the node being deleted
+        },
+        data: {
+          rootId: firstFollowUp.id, // Point to new root for color consistency
         },
       });
     }
