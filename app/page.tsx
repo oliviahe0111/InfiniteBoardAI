@@ -59,6 +59,48 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Demo Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-4">
+              See It In Action
+            </h2>
+            <p className="text-center text-gray-600 mb-10 max-w-2xl mx-auto">
+              Watch how InfiniteBoardAI helps you explore ideas through
+              interactive AI conversations
+            </p>
+            <div className="rounded-2xl overflow-hidden shadow-2xl border border-gray-200">
+              <div
+                style={{
+                  position: "relative",
+                  paddingBottom: "calc(68.626010286554% + 41px)",
+                  height: 0,
+                  width: "100%",
+                }}
+              >
+                <iframe
+                  src="https://demo.arcade.software/AI8z3mWp13AwbT7Me9s9?embed&embed_mobile=inline&embed_desktop=inline&show_copy_link=true"
+                  title="Ask and Explore Language Questions on the Demo Board"
+                  frameBorder="0"
+                  loading="lazy"
+                  allowFullScreen
+                  allow="clipboard-write"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    colorScheme: "light",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
