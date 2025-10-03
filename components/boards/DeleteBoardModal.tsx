@@ -34,30 +34,31 @@ export function DeleteBoardModal({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900 border border-white/10 rounded-lg p-6 w-full max-w-md shadow-xl">
+        <Dialog.Overlay className="fixed inset-0 bg-black/20 backdrop-blur-sm" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-gray-200 rounded-lg p-6 w-full max-w-md shadow-xl">
           <div className="flex items-center justify-between mb-4">
-            <Dialog.Title className="text-xl font-semibold text-white">
+            <Dialog.Title className="text-xl font-semibold text-gray-900">
               Delete Board
             </Dialog.Title>
             <Dialog.Close asChild>
-              <button className="p-1 rounded hover:bg-white/10 transition-colors">
+              <button className="p-1 rounded hover:bg-gray-100 transition-colors">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </Dialog.Close>
           </div>
 
-          <p className="text-gray-300 mb-6">
+          <p className="text-gray-700 mb-6">
             Are you sure you want to delete{" "}
-            <span className="font-semibold text-white">{boardTitle}</span>? This
-            action cannot be undone and will delete all nodes in this board.
+            <span className="font-semibold text-gray-900">{boardTitle}</span>?
+            This action cannot be undone and will delete all nodes in this
+            board.
           </p>
 
           <div className="flex justify-end gap-3">
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="px-4 py-2 rounded-lg text-gray-400 hover:bg-white/5 transition-colors"
+                className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 Cancel
               </button>

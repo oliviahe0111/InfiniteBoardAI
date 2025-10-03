@@ -28,7 +28,7 @@ export default async function MyBoardsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background-dark text-gray-200">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 justify-end mb-4">
           <UserAvatar user={user} />

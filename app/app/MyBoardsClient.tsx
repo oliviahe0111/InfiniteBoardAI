@@ -77,8 +77,8 @@ export function MyBoardsClient({ initialBoards }: MyBoardsClientProps) {
     <>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">My Boards</h1>
-          <p className="text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900">My Boards</h1>
+          <p className="text-gray-600 mt-1">
             {boards.length} {boards.length === 1 ? "board" : "boards"}
           </p>
         </div>
@@ -92,8 +92,8 @@ export function MyBoardsClient({ initialBoards }: MyBoardsClientProps) {
       </div>
 
       {boards.length === 0 ? (
-        <div className="bg-white/5 rounded-lg border border-white/10 p-12 text-center">
-          <p className="text-gray-400 mb-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center shadow-sm">
+          <p className="text-gray-600 mb-4">
             You haven&apos;t created any boards yet.
           </p>
           <button

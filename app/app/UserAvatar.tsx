@@ -52,7 +52,7 @@ export function UserAvatar({ user }: UserAvatarProps) {
 
   return (
     <div className="group relative">
-      <div className="w-10 h-10 rounded-full overflow-hidden bg-white/10 flex items-center justify-center border-2 border-white/20">
+      <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-gray-200">
         {isValidUrl && !imageError ? (
           <Image
             src={avatarUrl}
@@ -63,14 +63,14 @@ export function UserAvatar({ user }: UserAvatarProps) {
             onError={() => setImageError(true)}
           />
         ) : (
-          <span className="text-sm font-semibold text-white">
+          <span className="text-sm font-semibold text-gray-700">
             {getInitials()}
           </span>
         )}
       </div>
 
       {/* Tooltip on hover */}
-      <div className="absolute right-0 top-full mt-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+      <div className="absolute right-0 top-full mt-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
         {userName}
       </div>
     </div>

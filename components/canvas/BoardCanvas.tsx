@@ -213,9 +213,9 @@ export function BoardCanvas({ board: initialBoard, user }: BoardCanvasProps) {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-background-light dark:bg-background-dark">
+    <div className="h-screen w-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-slate-200 dark:border-slate-800 z-20 bg-background-light dark:bg-background-dark">
+      <header className="flex items-center justify-between px-6 py-3 border-b border-gray-200 z-20 bg-white">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/app")}
@@ -232,9 +232,7 @@ export function BoardCanvas({ board: initialBoard, user }: BoardCanvasProps) {
               />
             </svg>
           </button>
-          <h1 className="text-lg font-bold text-slate-800 dark:text-slate-200">
-            {board.title}
-          </h1>
+          <h1 className="text-lg font-bold text-gray-900">{board.title}</h1>
         </div>
         <div className="flex items-center gap-4">
           <UserAvatar user={user} />
@@ -356,14 +354,14 @@ export function BoardCanvas({ board: initialBoard, user }: BoardCanvasProps) {
             return (
               <>
                 {/* Zoom Controls */}
-                <div className="absolute bottom-4 right-4 flex items-center gap-1 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-1.5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 z-10">
+                <div className="absolute bottom-4 right-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm p-1.5 rounded-xl shadow-lg border border-gray-200 z-10">
                   <button
                     onClick={handleZoomIn}
-                    className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     title="Zoom In"
                   >
                     <svg
-                      className="w-5 h-5 text-slate-600 dark:text-slate-400"
+                      className="w-5 h-5 text-gray-700"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -378,11 +376,11 @@ export function BoardCanvas({ board: initialBoard, user }: BoardCanvasProps) {
                   </button>
                   <button
                     onClick={handleZoomOut}
-                    className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     title="Zoom Out"
                   >
                     <svg
-                      className="w-5 h-5 text-slate-600 dark:text-slate-400"
+                      className="w-5 h-5 text-gray-700"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -397,20 +395,20 @@ export function BoardCanvas({ board: initialBoard, user }: BoardCanvasProps) {
                   </button>
                   <button
                     onClick={fitToContent}
-                    className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     title="Fit to Content"
                   >
-                    <Maximize2 className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                    <Maximize2 className="w-5 h-5 text-gray-700" />
                   </button>
                   <button
                     onClick={() => resetTransform()}
-                    className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     title="Reset View"
                   >
-                    <FocusIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                    <FocusIcon className="w-5 h-5 text-gray-700" />
                   </button>
-                  <div className="border-l border-slate-300 dark:border-slate-700 h-6 mx-1"></div>
-                  <span className="text-sm font-semibold text-slate-600 dark:text-slate-400 px-2 w-20 text-center">
+                  <div className="border-l border-gray-300 h-6 mx-1"></div>
+                  <span className="text-sm font-semibold text-gray-700 px-2 w-20 text-center">
                     {Math.round(scale * 100)}%
                   </span>
                 </div>

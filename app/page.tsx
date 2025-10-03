@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background-dark text-gray-200">
+    <div className="flex flex-col min-h-screen bg-white text-gray-900">
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,11 +17,13 @@ export default function Home() {
                   fill="currentColor"
                 />
               </svg>
-              <h1 className="text-2xl font-bold text-white">InfiniteBoardAI</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                InfiniteBoardAI
+              </h1>
             </div>
             <div className="flex items-center">
               <a
-                className="bg-white/10 hover:bg-white/20 text-white text-sm font-semibold py-2 px-5 rounded-full transition-colors"
+                className="bg-gray-100 hover:bg-gray-200 text-gray-900 text-sm font-semibold py-2 px-5 rounded-full transition-colors"
                 href="/login"
               >
                 Log in
@@ -36,11 +38,11 @@ export default function Home() {
         <div className="relative w-full">
           <div className="absolute inset-0 background-gradient"></div>
           <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center py-40 md:py-56 lg:py-64">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 leading-tight">
               Spark Ideas, Visually. <br /> AI Conversations on an Infinite
               Canvas.
             </h1>
-            <p className="mt-8 max-w-2xl mx-auto text-lg text-gray-300">
+            <p className="mt-8 max-w-2xl mx-auto text-lg text-gray-700">
               Dive into a new era of brainstorming. InfiniteBoardAI merges
               AI-driven dialogue with a limitless visual workspace to transform
               your ideas into actionable insights.
@@ -58,10 +60,10 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-background-dark">
+      <footer className="bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-600">
               © 2025 InfiniteBoardAI. All rights reserved.
             </p>
           </div>

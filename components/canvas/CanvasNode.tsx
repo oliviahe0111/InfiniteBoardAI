@@ -43,7 +43,7 @@ interface CanvasNodeProps {
   ) => Promise<void>;
 }
 
-// Color palette for different root questions
+// Color palette for different root questions (green removed - conflicts with AI response background)
 const rootQuestionColors = [
   {
     bg: "bg-gradient-to-br from-blue-50 to-indigo-50",
@@ -56,12 +56,6 @@ const rootQuestionColors = [
     border: "border-purple-200",
     iconColor: "text-purple-600",
     accent: "purple",
-  },
-  {
-    bg: "bg-gradient-to-br from-green-50 to-emerald-50",
-    border: "border-green-200",
-    iconColor: "text-green-600",
-    accent: "green",
   },
   {
     bg: "bg-gradient-to-br from-amber-50 to-orange-50",

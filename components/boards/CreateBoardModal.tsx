@@ -37,20 +37,20 @@ export function CreateBoardModal({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-850 border border-white/10 rounded-xl p-8 w-full max-w-lg shadow-2xl">
+        <Dialog.Overlay className="fixed inset-0 bg-black/20 backdrop-blur-sm" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-gray-200 rounded-xl p-8 w-full max-w-lg shadow-2xl">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <Dialog.Title className="text-2xl font-bold text-white">
+              <Dialog.Title className="text-2xl font-bold text-gray-900">
                 Create a New Board
               </Dialog.Title>
-              <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-1 text-sm text-gray-600">
                 Start a new brainstorming session with an initial question.
               </p>
             </div>
             <Dialog.Close asChild>
-              <button className="p-1 rounded hover:bg-white/10 transition-colors">
-                <X className="w-5 h-5 text-gray-400" />
+              <button className="p-1 rounded hover:bg-gray-100 transition-colors">
+                <X className="w-5 h-5 text-gray-600" />
               </button>
             </Dialog.Close>
           </div>
@@ -59,7 +59,7 @@ export function CreateBoardModal({
             <div>
               <label
                 htmlFor="board-name"
-                className="block text-sm font-medium text-slate-300 mb-1"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Board Name
               </label>
@@ -69,7 +69,7 @@ export function CreateBoardModal({
                 placeholder="e.g., Marketing Strategy Q3"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 autoFocus
               />
             </div>
@@ -77,7 +77,7 @@ export function CreateBoardModal({
             <div>
               <label
                 htmlFor="first-question"
-                className="block text-sm font-medium text-slate-300 mb-1"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Your First Question
               </label>
@@ -87,7 +87,7 @@ export function CreateBoardModal({
                 value={firstQuestion}
                 onChange={(e) => setFirstQuestion(e.target.value)}
                 rows={4}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
               />
             </div>
 
@@ -95,7 +95,7 @@ export function CreateBoardModal({
               <Dialog.Close asChild>
                 <button
                   type="button"
-                  className="h-10 px-5 rounded-lg border border-slate-700 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors"
+                  className="h-10 px-5 rounded-lg border border-gray-300 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>

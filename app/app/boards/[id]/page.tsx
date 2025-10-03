@@ -70,7 +70,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
   };
 
   return (
-    <div className="h-screen w-screen bg-background-dark">
+    <div className="h-screen w-screen bg-gray-50">
       <BoardCanvas board={serializedBoard} user={serializedUser} />
     </div>
   );

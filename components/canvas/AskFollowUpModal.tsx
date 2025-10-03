@@ -39,27 +39,27 @@ export function AskFollowUpModal({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#1a2632] border border-gray-200 dark:border-gray-700 rounded-xl p-6 sm:p-8 w-full max-w-lg z-50 shadow-2xl">
+        <Dialog.Overlay className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-gray-200 rounded-xl p-6 sm:p-8 w-full max-w-lg z-50 shadow-2xl">
           <div className="flex items-start justify-between mb-4">
             <div className="flex flex-col">
-              <Dialog.Title className="text-xl font-bold text-gray-900 dark:text-white">
+              <Dialog.Title className="text-xl font-bold text-gray-900">
                 Ask a follow-up
               </Dialog.Title>
-              <Dialog.Description className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <Dialog.Description className="text-sm text-gray-600 mt-1">
                 Based on the selected text:
               </Dialog.Description>
             </div>
             <Dialog.Close asChild>
-              <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <button className="text-gray-400 hover:text-gray-600 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </Dialog.Close>
           </div>
 
           {/* Quoted Text Section */}
-          <div className="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-slate-50 dark:bg-slate-900/50">
-            <p className="text-sm text-gray-600 dark:text-gray-400 italic line-clamp-3">
+          <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <p className="text-sm text-gray-600 italic line-clamp-3">
               &ldquo;{quotedText}&rdquo;
             </p>
           </div>
@@ -75,7 +75,7 @@ export function AskFollowUpModal({
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="What are the best practices for implementing these tools?"
-                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary/50 focus:border-primary transition resize-none"
+                className="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary/50 focus:border-primary transition resize-none"
                 rows={4}
                 autoFocus
               />
@@ -85,7 +85,7 @@ export function AskFollowUpModal({
               <Dialog.Close asChild>
                 <button
                   type="button"
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                   disabled={isSubmitting}
                 >
                   Cancel
