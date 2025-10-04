@@ -74,14 +74,14 @@ export default function Home() {
               <div
                 style={{
                   position: "relative",
-                  paddingBottom: "calc(68.626010286554% + 41px)",
+                  paddingBottom: "calc(48.645833333333336% + 41px)",
                   height: 0,
                   width: "100%",
                 }}
               >
                 <iframe
-                  src="https://demo.arcade.software/xOY5G7NZOH4K251Ju9I4?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
-                  title="Ask Follow-Up Questions and Explore AI Responses on the Demo Board"
+                  src="https://demo.arcade.software/lzlAAw5ACoo4Kj23vOo7?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
+                  title="Ask Follow-Up Questions to AI on the Demo Board"
                   frameBorder="0"
                   loading="lazy"
                   allowFullScreen
